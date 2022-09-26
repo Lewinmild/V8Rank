@@ -15,54 +15,61 @@ class V8RankPipeline:
         # 写入json 备份
         self.file = open('v8rank.json', 'w')
         # 关键词列表
-        self.taffy = ["塔菲", "taffy"]
-        self.xing_tong = ["星瞳", "小星星", "瞳友"]
-        self.nanami = ["七海", "海子姐", "脆鲨"]
-        self.ruru = ["lulu", "ruru", "撸撸", "拉夫"]
-        self.san_jie = ["3姐", "三姐", "🦶", "啵啵"]
-        self.asoul = ["asoul", "啊楚", "a➗", "a/"]
+        self.taffy = ["塔菲", "taffy", "黑桃影", "tcg", "大菲住"]
+        self.xing_tong = ["星瞳", "小星星", "瞳友", "瞳/", "瞳楚", "瞳子", "瞳u", "瞳子", "瞳瞳"]
+        self.nanami = ["七海", "海子姐", "脆鲨", "010", "杰尼", "公海", "海海"]
+        self.ruru = ["lulu", "ruru", "撸撸", "拉夫", "雫露露"]
+        self.san_jie = ["3姐", "三姐", "🦶", "啵啵", "3/", "3u", "律师"]
+        self.asoul = ["asoul", "阿楚", "a楚", "a➗", "a/", "ac", "图a", "as"]
+        self.jia_ran = ["嘉然", "然然", "+➗", "+/"]
+        self.han_jian = ["东雪莲", "罕见"]
+        self.an_ke = ["安可", "红毛", "鹦鹉"]
+        self.eoe = ["eoe", "ec", "e➗", "e/", "EOE"]
+        self.mao_lei = ["猫雷", "陪酒"]
+        self.a_zi = ["阿梓", "孝孩梓"]
+        self.nai_lv = ["奶绿", "文静", "奶学长"]
+        self.xiang_wan = ["向晚", "晚子", "顶碗"]
+        self.lu_zao = ["露早"]
+        self.kino = ["kino", "吉诺儿", "KINO"]
+        self.bing_tang = ["冰糖", "冰子"]
+
+        self.keywords = {
+            '塔菲': self.taffy,
+            '星瞳': self.xing_tong,
+            '七海': self.nanami,
+            'るる': self.ruru,
+            '3': self.san_jie,
+            'asoul': self.asoul,
+            '嘉然': self.jia_ran,
+            '东雪莲': self.han_jian,
+            '安可': self.an_ke,
+            'eoe': self.eoe,
+            '猫雷': self.mao_lei,
+            '阿梓': self.a_zi,
+            '奶绿': self.nai_lv,
+            '向晚': self.xiang_wan,
+            '露早': self.lu_zao,
+            '吉诺儿': self.kino,
+            '冰糖': self.bing_tang
+        }
 
     def process_item(self, item, spider):
         # 强转字典
         item = dict(item)
+        print(item)
         # 标题与正文合并
         item['title'].join(item['body'])
 
-        # 计数 塔菲
-        for keyword in self.taffy:
-            if keyword in item['title']:
-                Statistics.mention_taffy()
-        Statistics.plus_taffy()
-
-        # 计数 星瞳
-        for keyword in self.xing_tong:
-            if keyword in item['title']:
-                Statistics.mention_xing_tong()
-        Statistics.plus_xing_tong()
-
-        # 计数 七海
-        for keyword in self.nanami:
-            if keyword in item['title']:
-                Statistics.mention_nanami()
-        Statistics.plus_nanami()
-
-        # 计数 るる
-        for keyword in self.ruru:
-            if keyword in item['title']:
-                Statistics.mention_ruru()
-        Statistics.plus_ruru()
-
-        # 计数 3
-        for keyword in self.san_jie:
-            if keyword in item['title']:
-                Statistics.mention_san_jie()
-        Statistics.plus_san_jie()
-
-        # 计数 asoul
-        for keyword in self.asoul:
-            if keyword in item['title']:
-                Statistics.mention_asoul()
-        Statistics.plus_asoul()
+        for name in self.keywords:
+            for keyword in self.keywords[name]:
+                if keyword in item['title']:
+                    Statistics.mention(name)
+                Statistics.plus(name)
+            for keyword in self.keywords[name]:
+                for comment in item['comments']:
+                    if keyword in comment:
+                        Statistics.mention(name)
+                    Statistics.plus(name)
 
         # 字典数据序列化
         json_data = json.dumps(item) + ',\n'
@@ -77,68 +84,26 @@ class V8RankPipeline:
 
 
 class Statistics:
-    isMention = {"塔菲": 0, "星瞳": 0, "七海": 0, "るる": 0, "3": 0, "asoul": 0}
-    result = {"塔菲": 0, "星瞳": 0, "七海": 0, "るる": 0, "3": 0, "asoul": 0}
+
+    isMention = {"塔菲": 0, "星瞳": 0, "七海": 0, "るる": 0, "3": 0,
+                   "asoul": 0, "嘉然": 0, "东雪莲": 0, "安可": 0, "eoe": 0,
+                   "猫雷": 0, "阿梓": 0, "奶绿": 0, "向晚": 0, "露早": 0,
+                   "吉诺儿": 0, "冰糖": 0}
+
+    result = {"塔菲": 0, "星瞳": 0, "七海": 0, "るる": 0, "3": 0,
+                   "asoul": 0, "嘉然": 0, "东雪莲": 0, "安可": 0, "eoe": 0,
+                   "猫雷": 0, "阿梓": 0, "奶绿": 0, "向晚": 0, "露早": 0,
+                   "吉诺儿": 0, "冰糖": 0}
 
     @classmethod
-    def mention_taffy(cls):
-        cls.isMention['塔菲'] += 1
+    def mention(cls, v_name):
+        cls.isMention[v_name] += 1
 
     @classmethod
-    def plus_taffy(cls):
-        if cls.isMention['塔菲'] > 0:
-            cls.result['塔菲'] += 1
-            cls.isMention['塔菲'] = 0
-
-    @classmethod
-    def mention_xing_tong(cls):
-        cls.isMention['星瞳'] += 1
-
-    @classmethod
-    def plus_xing_tong(cls):
-        if cls.isMention['星瞳'] > 0:
-            cls.result['星瞳'] += 1
-            cls.isMention['星瞳'] = 0
-
-    @classmethod
-    def mention_nanami(cls):
-        cls.isMention['七海'] += 1
-
-    @classmethod
-    def plus_nanami(cls):
-        if cls.isMention['七海'] > 0:
-            cls.result['七海'] += 1
-            cls.isMention['七海'] = 0
-
-    @classmethod
-    def mention_ruru(cls):
-        cls.isMention['るる'] += 1
-
-    @classmethod
-    def plus_ruru(cls):
-        if cls.isMention['るる'] > 0:
-            cls.result['るる'] += 1
-            cls.isMention['るる'] = 0
-
-    @classmethod
-    def mention_san_jie(cls):
-        cls.isMention['3'] += 1
-
-    @classmethod
-    def plus_san_jie(cls):
-        if cls.isMention['3'] > 0:
-            cls.result['3'] += 1
-            cls.isMention['3'] = 0
-
-    @classmethod
-    def mention_asoul(cls):
-        cls.isMention['asoul'] += 1
-
-    @classmethod
-    def plus_asoul(cls):
-        if cls.isMention['asoul'] > 0:
-            cls.result['asoul'] += 1
-            cls.isMention['asoul'] = 0
+    def plus(cls, v_name):
+        if cls.isMention[v_name] > 0:
+            cls.result[v_name] += 1
+            cls.isMention[v_name] = 0
 
     @classmethod
     def show_result(cls):

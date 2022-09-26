@@ -15,3 +15,8 @@ class V8RankItem(scrapy.Item):
     author = scrapy.Field()
     # 时间
     time = scrapy.Field()
+    # 链接
+    post_id = scrapy.Field()
+    # 回复
+    comments = scrapy.Field()
+
